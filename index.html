@@ -16,9 +16,18 @@
             background: #ffff00;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+        }
+
+        .hero-logo {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            margin-bottom: 30px;
+            object-fit: contain;
         }
 
         .container {
@@ -183,6 +192,11 @@
         }
 
         @media (max-width: 768px) {
+            .hero-logo {
+                max-width: 250px;
+                margin-bottom: 25px;
+            }
+
             .container {
                 padding: 20px;
                 margin: 10px;
@@ -215,6 +229,11 @@
         }
 
         @media (max-width: 480px) {
+            .hero-logo {
+                max-width: 200px;
+                margin-bottom: 20px;
+            }
+
             .input-group input {
                 padding: 20px;
                 font-size: 0.95em;
@@ -238,6 +257,8 @@
     </style>
 </head>
 <body>
+    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDMwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcng9IjEwIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iNTUiIGZpbGw9IiNmZjAwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxvZ28gSGVyZTwvdGV4dD4KPC9zdmc+" alt="T.Y. Supplementary Centre Logo" class="hero-logo">
+
     <div class="container">
         <div class="header">
             <h1>📊 Results Portal</h1>

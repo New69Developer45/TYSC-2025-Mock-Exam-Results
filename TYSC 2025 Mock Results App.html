@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffff00;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #000000;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .header p {
+            color: #000000;
+            font-size: 1.1em;
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #006600;
+        }
+
+        .search-btn {
+            background: #006600;
+            color: #ffffff;
+            border: 2px solid #000000;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .search-btn:hover {
+            background: #004400;
+            transform: translateY(-2px);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            display: none;
+            text-align: left;
+        }
+
+        .student-info {
+            background: #ffff00;
+            border: 2px solid #000000;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .student-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 5px;
+        }
+
+        .student-number {
+            color: #000000;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 2px solid #000000;
+        }
+
+        .grades-table th,
+        .grades-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #000000;
+        }
+
+        .grades-table th {
+            background: #006600;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .grades-table tr:hover {
+            background: #ffff00;
+        }
+
+        .grade {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #000000;
+        }
+
+        .grade-A { background: #006600; color: #ffffff; }
+        .grade-B { background: #ffffff; color: #000000; }
+        .grade-C { background: #ffff00; color: #000000; }
+        .grade-D { background: #ffffff; color: #000000; border: 2px solid #000000; }
+        .grade-F { background: #000000; color: #ffffff; }
+
+        .error-message {
+            background: #ffffff;
+            color: #000000;
+            border: 2px solid #000000;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            background: #000000;
+            color: #ffffff;
+            border: 2px solid #000000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .grades-table {
+                font-size: 0.9em;
+            }
+
+            .grades-table th,
+            .grades-table td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grades-table th,
+            .grades-table td {
+                padding: 6px 4px;
+                font-size: 0.8em;
+            }
+
+            .student-info {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Results Portal</h1>
+            <p>Enter your student number to view your mock exam results</p>
+        </div>
+
+        <div class="search-section" id="searchSection">
+            <div class="input-group">
+                <input type="text" id="studentNumber" placeholder="Enter your student number (e.g., S2024001)" maxlength="20">
+            </div>
+            <button class="search-btn" onclick="searchResults()">🔍 Check Results</button>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            Student number not found. Please check your student number and try again.
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="student-info">
+                <div class="student-name" id="studentName"></div>
+                <div class="student-number" id="displayStudentNumber"></div>
+            </div>
+
+            <table class="grades-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="gradesTableBody">
+                </tbody>
+            </table>
+
+            <button class="back-btn" onclick="goBack()">← Back to Search</button>
+        </div>
+    </div>
+
+    <script>
+        // Sample student data - Replace this with your actual data
+        const studentData = {
+            'S2024001': {
+                name: 'John Smith',
+                subjects: {
+                    'Mathematics': 'A',
+                    'English': 'B+',
+                    'Science': 'A-',
+                    'History': 'B',
+                    'Geography': 'C+'
+                }
+            },
+            'S2024002': {
+                name: 'Sarah Johnson',
+                subjects: {
+                    'Mathematics': 'B',
+                    'English': 'A',
+                    'Science': 'B+',
+                    'History': 'A-',
+                    'Geography': 'B'
+                }
+            },
+            'S2024003': {
+                name: 'Michael Brown',
+                subjects: {
+                    'Mathematics': 'C',
+                    'English': 'B-',
+                    'Science': 'C+',
+                    'History': 'C',
+                    'Geography': 'D+'
+                }
+            },
+            'S2024004': {
+                name: 'Emma Davis',
+                subjects: {
+                    'Mathematics': 'A+',
+                    'English': 'A',
+                    'Science': 'A',
+                    'History': 'A-',
+                    'Geography': 'A'
+                }
+            },
+            'S2024005': {
+                name: 'James Wilson',
+                subjects: {
+                    'Mathematics': 'B-',
+                    'English': 'C+',
+                    'Science': 'B',
+                    'History': 'C',
+                    'Geography': 'C+'
+                }
+            }
+        };
+
+        function getGradeClass(grade) {
+            const firstLetter = grade.charAt(0).toUpperCase();
+            switch (firstLetter) {
+                case 'A': return 'grade-A';
+                case 'B': return 'grade-B';
+                case 'C': return 'grade-C';
+                case 'D': return 'grade-D';
+                case 'F': return 'grade-F';
+                default: return 'grade-C';
+            }
+        }
+
+        function searchResults() {
+            const studentNumber = document.getElementById('studentNumber').value.trim().toUpperCase();
+            const errorMessage = document.getElementById('errorMessage');
+            const resultsSection = document.getElementById('resultsSection');
+            const searchSection = document.getElementById('searchSection');
+
+            // Hide error message
+            errorMessage.style.display = 'none';
+
+            if (!studentNumber) {
+                errorMessage.textContent = 'Please enter a student number.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            const student = studentData[studentNumber];
+
+            if (!student) {
+                errorMessage.textContent = 'Student number not found. Please check your student number and try again.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Display results
+            document.getElementById('studentName').textContent = student.name;
+            document.getElementById('displayStudentNumber').textContent = `Student Number: ${studentNumber}`;
+
+            const tableBody = document.getElementById('gradesTableBody');
+            tableBody.innerHTML = '';
+
+            for (const [subject, grade] of Object.entries(student.subjects)) {
+                const row = tableBody.insertRow();
+                const subjectCell = row.insertCell(0);
+                const gradeCell = row.insertCell(1);
+
+                subjectCell.textContent = subject;
+                gradeCell.innerHTML = `<span class="grade ${getGradeClass(grade)}">${grade}</span>`;
+            }
+
+            // Hide search section and show results
+            searchSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+        }
+
+        function goBack() {
+            const resultsSection = document.getElementById('resultsSection');
+            const searchSection = document.getElementById('searchSection');
+            const errorMessage = document.getElementById('errorMessage');
+
+            resultsSection.style.display = 'none';
+            searchSection.style.display = 'block';
+            errorMessage.style.display = 'none';
+            document.getElementById('studentNumber').value = '';
+        }
+
+        // Allow Enter key to search
+        document.getElementById('studentNumber').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                searchResults();
+            }
+        });
+
+        // Focus on input when page loads
+        window.onload = function() {
+            document.getElementById('studentNumber').focus();
+        };
+    </script>
+</body>
+</html>

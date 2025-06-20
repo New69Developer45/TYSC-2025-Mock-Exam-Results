@@ -121,7 +121,7 @@
             margin-bottom: 5px;
         }
 
-        .student-number {
+        .candidate-number {
             color: #000000;
             font-size: 1em;
             font-weight: bold;
@@ -260,24 +260,24 @@
     <div class="container">
         <div class="header">
             <h1>📊 Results Portal</h1>
-            <p>Enter your student number to view your mock exam results</p>
+            <p>Enter your candidate number to view your mock exam results</p>
         </div>
 
         <div class="search-section" id="searchSection">
             <div class="input-group">
-                <input type="text" id="studentNumber" placeholder="(e.g., S2024001)" maxlength="20">
+                <input type="text" id="candidateNumber" placeholder="(e.g., S2024001)" maxlength="20">
             </div>
             <button class="search-btn" onclick="searchResults()">🔍 Check Results</button>
         </div>
 
         <div class="error-message" id="errorMessage">
-            Student number not found. Please check your student number and try again.
+            Candidate number not found. Please check your candidate number and try again.
         </div>
 
         <div class="results-section" id="resultsSection">
             <div class="student-info">
                 <div class="student-name" id="studentName"></div>
-                <div class="student-number" id="displayStudentNumber"></div>
+                <div class="candidate-number" id="displayCandidateNumber"></div>
             </div>
 
             <table class="grades-table">
@@ -363,7 +363,7 @@
         }
 
         function searchResults() {
-            const studentNumber = document.getElementById('studentNumber').value.trim().toUpperCase();
+            const candidateNumber = document.getElementById('candidateNumber').value.trim().toUpperCase();
             const errorMessage = document.getElementById('errorMessage');
             const resultsSection = document.getElementById('resultsSection');
             const searchSection = document.getElementById('searchSection');
@@ -371,23 +371,23 @@
             // Hide error message
             errorMessage.style.display = 'none';
 
-            if (!studentNumber) {
-                errorMessage.textContent = 'Please enter a student number.';
+            if (!candidateNumber) {
+                errorMessage.textContent = 'Please enter a candidate number.';
                 errorMessage.style.display = 'block';
                 return;
             }
 
-            const student = studentData[studentNumber];
+            const student = studentData[candidateNumber];
 
             if (!student) {
-                errorMessage.textContent = 'Student number not found. Please check your student number and try again.';
+                errorMessage.textContent = 'Candidate number not found. Please check your candidate number and try again.';
                 errorMessage.style.display = 'block';
                 return;
             }
 
             // Display results
             document.getElementById('studentName').textContent = student.name;
-            document.getElementById('displayStudentNumber').textContent = `Student Number: ${studentNumber}`;
+            document.getElementById('displayCandidateNumber').textContent = `Candidate Number: ${candidateNumber}`;
 
             const tableBody = document.getElementById('gradesTableBody');
             tableBody.innerHTML = '';
@@ -414,11 +414,11 @@
             resultsSection.style.display = 'none';
             searchSection.style.display = 'block';
             errorMessage.style.display = 'none';
-            document.getElementById('studentNumber').value = '';
+            document.getElementById('candidateNumber').value = '';
         }
 
         // Allow Enter key to search
-        document.getElementById('studentNumber').addEventListener('keypress', function(event) {
+        document.getElementById('candidateNumber').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 searchResults();
             }
@@ -426,7 +426,7 @@
 
         // Focus on input when page loads
         window.onload = function() {
-            document.getElementById('studentNumber').focus();
+            document.getElementById('candidateNumber').focus();
         };
     </script>
 </body>

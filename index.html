@@ -101,6 +101,20 @@
             transform: translateY(0);
         }
 
+        .search-btn:disabled {
+            background: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            color: #006600;
+            font-weight: bold;
+            margin: 10px 0;
+            display: none;
+        }
+
         .results-section {
             display: none;
             text-align: left;
@@ -162,7 +176,15 @@
         .grade-B { background: #ffffff; color: #000000; }
         .grade-C { background: #ffff00; color: #000000; }
         .grade-D { background: #ffffff; color: #000000; border: 2px solid #000000; }
-        .grade-F { background: #000000; color: #ffffff; }
+        .grade-E { background: #ffa500; color: #000000; }
+        .grade-F { background: #ff0000; color: #ffffff; }
+        .grade-G { background: #000000; color: #ffffff; }
+
+        .not-registered {
+            color: #888888;
+            font-style: italic;
+            padding: 5px 10px;
+        }
 
         .error-message {
             background: #ffffff;
@@ -265,9 +287,10 @@
 
         <div class="search-section" id="searchSection">
             <div class="input-group">
-                <input type="text" id="candidateNumber" placeholder="(e.g., S2024001)" maxlength="20">
+                <input type="text" id="candidateNumber" placeholder="(e.g., 202406001)" maxlength="20">
             </div>
-            <button class="search-btn" onclick="searchResults()">🔍 Check Results</button>
+            <button class="search-btn" id="searchBtn" onclick="searchResults()">🔍 Check Results</button>
+            <div class="loading" id="loadingMessage">Loading results...</div>
         </div>
 
         <div class="error-message" id="errorMessage">
@@ -295,78 +318,87 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        // Sample student data - Replace this with your actual data
-        const studentData = {
-            'S2024001': {
-                name: 'John Smith',
-                subjects: {
-                    'Mathematics': 'A',
-                    'English': 'B+',
-                    'Science': 'A-',
-                    'History': 'B',
-                    'Geography': 'C+'
+        let studentData = {};
+        let dataLoaded = false;
+
+        // Load results from Excel file hosted on GitHub
+        async function loadResultsFromExcel() {
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/New69Developer45/TYSC-2025-Mock-Exam-Results/main/TYSC_2025_Mid_Year_Mock_Exams_Results_FINAL.xlsx');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch Excel file');
                 }
-            },
-            'S2024002': {
-                name: 'Sarah Johnson',
-                subjects: {
-                    'Mathematics': 'B',
-                    'English': 'A',
-                    'Science': 'B+',
-                    'History': 'A-',
-                    'Geography': 'B'
-                }
-            },
-            'S2024003': {
-                name: 'Michael Brown',
-                subjects: {
-                    'Mathematics': 'C',
-                    'English': 'B-',
-                    'Science': 'C+',
-                    'History': 'C',
-                    'Geography': 'D+'
-                }
-            },
-            'S2024004': {
-                name: 'Emma Davis',
-                subjects: {
-                    'Mathematics': 'A+',
-                    'English': 'A',
-                    'Science': 'A',
-                    'History': 'A-',
-                    'Geography': 'A'
-                }
-            },
-            'S2024005': {
-                name: 'James Wilson',
-                subjects: {
-                    'Mathematics': 'B-',
-                    'English': 'C+',
-                    'Science': 'B',
-                    'History': 'C',
-                    'Geography': 'C+'
-                }
+
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                
+                // Convert to our data structure
+                studentData = {};
+                jsonData.forEach(row => {
+                    const candidateNumber = String(row['Candidate Number']).trim();
+                    const name = row['Names'] || '';
+                    
+                    // Extract subjects and grades
+                    const subjects = {};
+                    
+                    // Map the subjects from your Excel structure
+                    const subjectMapping = {
+                        'MATHEMATICS': 'Mathematics',
+                        'ENGLISH': 'English',
+                        'PHYSICAL SCIENCE': 'Physical Science',
+                        'BIOLOGY': 'Biology',
+                        'ACCOUNTING': 'Accounting'
+                    };
+                    
+                    for (const [excelCol, displayName] of Object.entries(subjectMapping)) {
+                        const grade = row[excelCol];
+                        if (grade && grade.toString().trim() !== '') {
+                            subjects[displayName] = grade.toString().trim();
+                        }
+                    }
+                    
+                    if (candidateNumber) {
+                        studentData[candidateNumber] = {
+                            name: name,
+                            subjects: subjects
+                        };
+                    }
+                });
+                
+                dataLoaded = true;
+                return true;
+            } catch (error) {
+                console.error('Error loading Excel file:', error);
+                return false;
             }
-        };
+        }
 
         function getGradeClass(grade) {
-            const firstLetter = grade.charAt(0).toUpperCase();
-            switch (firstLetter) {
+            const cleanGrade = grade.replace('*', '').charAt(0).toUpperCase();
+            switch (cleanGrade) {
                 case 'A': return 'grade-A';
                 case 'B': return 'grade-B';
                 case 'C': return 'grade-C';
                 case 'D': return 'grade-D';
+                case 'E': return 'grade-E';
                 case 'F': return 'grade-F';
+                case 'G': return 'grade-G';
                 default: return 'grade-C';
             }
         }
 
-        function searchResults() {
-            const candidateNumber = document.getElementById('candidateNumber').value.trim().toUpperCase();
+        async function searchResults() {
+            const candidateNumber = document.getElementById('candidateNumber').value.trim();
             const errorMessage = document.getElementById('errorMessage');
             const resultsSection = document.getElementById('resultsSection');
             const searchSection = document.getElementById('searchSection');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const searchBtn = document.getElementById('searchBtn');
 
             // Hide error message
             errorMessage.style.display = 'none';
@@ -376,6 +408,29 @@
                 errorMessage.style.display = 'block';
                 return;
             }
+
+            // Show loading and disable button
+            loadingMessage.style.display = 'block';
+            searchBtn.disabled = true;
+            searchBtn.textContent = 'Loading...';
+
+            // Load data if not already loaded
+            if (!dataLoaded) {
+                const success = await loadResultsFromExcel();
+                if (!success) {
+                    errorMessage.textContent = 'Error loading results data. Please try again later.';
+                    errorMessage.style.display = 'block';
+                    loadingMessage.style.display = 'none';
+                    searchBtn.disabled = false;
+                    searchBtn.textContent = '🔍 Check Results';
+                    return;
+                }
+            }
+
+            // Hide loading
+            loadingMessage.style.display = 'none';
+            searchBtn.disabled = false;
+            searchBtn.textContent = '🔍 Check Results';
 
             const student = studentData[candidateNumber];
 
@@ -392,13 +447,22 @@
             const tableBody = document.getElementById('gradesTableBody');
             tableBody.innerHTML = '';
 
-            for (const [subject, grade] of Object.entries(student.subjects)) {
+            // Check if student has any subjects
+            if (Object.keys(student.subjects).length === 0) {
                 const row = tableBody.insertRow();
-                const subjectCell = row.insertCell(0);
-                const gradeCell = row.insertCell(1);
+                const cell = row.insertCell(0);
+                cell.colSpan = 2;
+                cell.innerHTML = '<span class="not-registered">No subjects registered</span>';
+                cell.style.textAlign = 'center';
+            } else {
+                for (const [subject, grade] of Object.entries(student.subjects)) {
+                    const row = tableBody.insertRow();
+                    const subjectCell = row.insertCell(0);
+                    const gradeCell = row.insertCell(1);
 
-                subjectCell.textContent = subject;
-                gradeCell.innerHTML = `<span class="grade ${getGradeClass(grade)}">${grade}</span>`;
+                    subjectCell.textContent = subject;
+                    gradeCell.innerHTML = `<span class="grade ${getGradeClass(grade)}">${grade}</span>`;
+                }
             }
 
             // Hide search section and show results

@@ -173,12 +173,13 @@
         }
 
         .grade-A { background: #006600; color: #ffffff; }
-        .grade-B { background: #ffffff; color: #000000; }
-        .grade-C { background: #ffff00; color: #000000; }
-        .grade-D { background: #ffffff; color: #000000; border: 2px solid #000000; }
+        .grade-B { background: #006600; color: #ffffff; }
+        .grade-C { background: #006600; color: #ffffff; }
+        .grade-D { background: #006600; color: #ffffff; }
         .grade-E { background: #ffa500; color: #000000; }
         .grade-F { background: #ff0000; color: #ffffff; }
         .grade-G { background: #000000; color: #ffffff; }
+        .grade-U { background: #000000; color: #ffffff; }
 
         .not-registered {
             color: #888888;
@@ -307,7 +308,7 @@
                 <thead>
                     <tr>
                         <th>Subject</th>
-                        <th>Grade</th>
+                        <th>Symbol</th>
                     </tr>
                 </thead>
                 <tbody id="gradesTableBody">
@@ -392,7 +393,8 @@
                 case 'E': return 'grade-E';
                 case 'F': return 'grade-F';
                 case 'G': return 'grade-G';
-                default: return 'grade-C';
+                case 'U': return 'grade-U';
+                default: return 'grade-U';
             }
         }
 

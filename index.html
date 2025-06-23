@@ -326,16 +326,19 @@
         // Load results from Excel file hosted on GitHub
         async function loadResultsFromExcel() {
             try {
-                const response = await fetch('https://raw.githubusercontent.com/New69Developer45/TYSC-2025-Mock-Exam-Results/main/TYSC_2025_Mid_Year_Mock_Exams_Results_FINAL.xlsx');
+                // Fixed URL with proper encoding for spaces
+                const response = await fetch('https://raw.githubusercontent.com/New69Developer45/TYSC-2025-Mock-Exam-Results/main/TYSC%202025%20Mid%20Year%20Mock%20Exams%20Results_FINAL.xlsx');
                 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch Excel file');
+                    throw new Error(`Failed to fetch Excel file: ${response.status} ${response.statusText}`);
                 }
 
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                
+                console.log('Loaded data:', jsonData); // Debug log
                 
                 // Convert to our data structure
                 studentData = {};
@@ -370,6 +373,7 @@
                     }
                 });
                 
+                console.log('Processed student data:', studentData); // Debug log
                 dataLoaded = true;
                 return true;
             } catch (error) {

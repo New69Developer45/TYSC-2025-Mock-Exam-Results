@@ -327,8 +327,8 @@
         // Load results from Excel file hosted on GitHub
         async function loadResultsFromExcel() {
             try {
-                // Fixed URL with proper encoding for spaces
-                const response = await fetch('https://raw.githubusercontent.com/New69Developer45/TYSC-2025-Mock-Exam-Results/main/TYSC%202025%20Mid%20Year%20Mock%20Exams%20Results_FINAL.xlsx');
+                // Updated URL for the new Excel file
+                const response = await fetch('https://raw.githubusercontent.com/New69Developer45/TYSC-2025-Mock-Exam-Results/main/TYSC%202025%20Mid%20Year%20Mock%20Exams%20Results_FINAL_Version.xlsx');
                 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch Excel file: ${response.status} ${response.statusText}`);
